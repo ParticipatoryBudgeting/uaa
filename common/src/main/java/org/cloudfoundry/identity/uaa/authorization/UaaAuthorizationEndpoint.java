@@ -314,9 +314,9 @@ public class UaaAuthorizationEndpoint extends AbstractEndpoint {
             throw new InvalidRequestException("An implicit grant could not be made");
         }
 
-        boolean fragment = true;
+        boolean fragment = false;
         if (requestedRedirect.contains("#")) {
-            fragment = false;
+            fragment = true;
         }
         StringBuilder url = new StringBuilder();
         url.append("token_type=").append(encode(accessToken.getTokenType()));
@@ -359,7 +359,7 @@ public class UaaAuthorizationEndpoint extends AbstractEndpoint {
             }
         }
 
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(requestedRedirect);
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(requestedRedirect);
         if (fragment) {
             String existingFragment = builder.build(true).getFragment();
             if (StringUtils.hasText(existingFragment)) {
