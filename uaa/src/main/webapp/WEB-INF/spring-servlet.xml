@@ -56,7 +56,16 @@
     <bean id="oauth2TokenParseFilter" class="java.lang.Class" factory-method="forName">
         <constructor-arg value="org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationProcessingFilter"/>
     </bean>
+
     <bean id="corsFilter" class="org.cloudfoundry.identity.uaa.web.CorsFilter"/>
+    <bean id="csrfFilter" class="org.springframework.security.web.csrf.CsrfFilter">
+        <constructor-arg>
+            <bean class="org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository" id="csrfTokenRepository"/>
+        </constructor-arg>
+    </bean>
+
+    <bean id="requestDataValueProcessor" class="org.springframework.security.web.servlet.support.csrf.CsrfRequestDataValueProcessor"/>
+
 
     <bean class="org.cloudfoundry.identity.uaa.security.web.SecurityFilterChainPostProcessor">
         <property name="requireHttps" value="${require_https:false}" />
@@ -91,6 +100,7 @@
                 <!-- Zone switcher goes *after* class OAuth2AuthenticationProcessingFilter as it requires a token to be present to work -->
                 <entry value-ref="identityZoneSwitchingFilter"
                        key="#{T(org.cloudfoundry.identity.uaa.security.web.SecurityFilterChainPostProcessor.FilterPosition).after(@oauth2TokenParseFilter)}"/>
+                <entry value-ref="csrfFilter" key="#{T(org.cloudfoundry.identity.uaa.security.web.SecurityFilterChainPostProcessor.FilterPosition).position(100)}"/>
                 <entry value-ref="xFrameOptionsFilter" key="#{T(org.cloudfoundry.identity.uaa.security.web.SecurityFilterChainPostProcessor.FilterPosition).position(101)}"/>
         	</map>
         </property>
